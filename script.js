@@ -115,11 +115,15 @@ createUsername(accounts);
 btnLogin.addEventListener("click", (e) => {
   e.preventDefault();
 
+
   const currentUser = accounts.find(
     (e) => e.username === inputLoginUsername.value
   );
 
   if (Number(inputLoginPin.value) === currentUser.pin) {
+    labelWelcome.textContent = `Welcome back! ${
+      currentUser.owner.split(" ")[0]
+    }`;
     displayMovements(currentUser.movements);
     calcDisplayBalance(currentUser.movements);
     calcDisplaySummary(currentUser);
