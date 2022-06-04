@@ -125,7 +125,7 @@ btnLogin.addEventListener("click", (e) => {
 
   currentUser = accounts.find((e) => e.username === inputLoginUsername.value);
 
-  if (Number(inputLoginPin.value) === currentUser.pin) {
+  if (Number(inputLoginPin.value) === currentUser?.pin) {
     labelWelcome.textContent = `Welcome back! ${
       currentUser.owner.split(" ")[0]
     }`;
@@ -160,4 +160,21 @@ btnTransfer.addEventListener("click", (e) => {
 
     updateUI(currentUser);
   }
+});
+
+btnClose.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  if (
+    inputCloseUsername.value === currentUser.username &&
+    Number(inputClosePin.value) === currentUser.pin
+  ) {
+    const indexUser = accounts.findIndex(
+      (e) => e.username === inputCloseUsername.value
+    );
+
+    accounts.splice(indexUser, 1);
+  }
+
+  containerApp.style.opacity = 0;
 });
