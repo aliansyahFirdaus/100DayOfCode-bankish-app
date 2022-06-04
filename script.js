@@ -61,6 +61,8 @@ const inputLoanAmount = document.querySelector(".form__input--loan-amount");
 const inputCloseUsername = document.querySelector(".form__input--user");
 const inputClosePin = document.querySelector(".form__input--pin");
 
+let currentUser;
+
 const displayMovements = function (movements) {
   containerMovements.innerHTML = "";
 
@@ -78,6 +80,12 @@ const displayMovements = function (movements) {
   });
 };
 
+const updateUI = (currentUser) => {
+  displayMovements(currentUser.movements);
+  calcDisplayBalance(currentUser);
+  calcDisplaySummary(currentUser);
+};
+
 const createUsername = function (accs) {
   accs.forEach(
     (acc) =>
@@ -89,9 +97,9 @@ const createUsername = function (accs) {
   );
 };
 
-const calcDisplayBalance = function (movements) {
-  const balance = movements.reduce((cur, mov) => cur + mov, 0);
-  labelBalance.textContent = `${balance}€`;
+const calcDisplayBalance = function (acc) {
+  acc.balance = acc.movements.reduce((cur, mov) => cur + mov, 0);
+  labelBalance.textContent = `${acc.balance}€`;
 };
 
 const calcDisplaySummary = function (acc) {
@@ -115,22 +123,41 @@ createUsername(accounts);
 btnLogin.addEventListener("click", (e) => {
   e.preventDefault();
 
-
-  const currentUser = accounts.find(
-    (e) => e.username === inputLoginUsername.value
-  );
+  currentUser = accounts.find((e) => e.username === inputLoginUsername.value);
 
   if (Number(inputLoginPin.value) === currentUser.pin) {
     labelWelcome.textContent = `Welcome back! ${
       currentUser.owner.split(" ")[0]
     }`;
-    displayMovements(currentUser.movements);
-    calcDisplayBalance(currentUser.movements);
-    calcDisplaySummary(currentUser);
+
+    updateUI(currentUser);
 
     containerApp.style.opacity = 100;
   }
 
   inputLoginPin.value = inputLoginUsername.value = "";
   inputLoginPin.blur();
+});
+
+btnTransfer.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  const targetUser = accounts.find((e) => e.username === inputTransferTo.value);
+  const amount = Number(inputTransferAmount.value);
+
+  inputTransferTo.value = inputTransferAmount.value = "";
+  inputTransferTo.blur();
+  inputTransferAmount.blur();
+
+  if (
+    amount > 0 &&
+    targetUser &&
+    targetUser.owner !== currentUser.owner &&
+    amount <= currentUser.balance
+  ) {
+    targetUser.movements.push(amount);
+    currentUser.movements.push(-amount);
+
+    updateUI(currentUser);
+  }
 });
